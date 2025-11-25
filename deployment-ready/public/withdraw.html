@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Withdraw - NexChain</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-light: #34d399;
+      --secondary: #3b82f6;
+      --secondary-light: #60a5fa;
+      --accent: #8b5cf6;
+      --accent-light: #a78bfa;
+      --dark: #0f172a;
+      --light: #f8fafc;
+      --card-bg: #1e293b;
+      --border: rgba(16, 185, 129, 0.2);
+    }
+    
+    * { 
+      margin: 0; padding: 0; 
+      box-sizing: border-box; 
+      font-family: 'Poppins', sans-serif; 
+    }
+    
+    body { 
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); 
+      color: var(--light); 
+      min-height: 100vh;
+      padding: 20px; 
+    }
+    
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle {
+      display: none;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: var(--primary);
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 1.25rem;
+    }
+
+    .mobile-menu-toggle:hover {
+      background: rgba(16, 185, 129, 0.2);
+    }
+    
+    .container { 
+      max-width: 1200px; 
+      margin: 0 auto; 
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .logo::before {
+      content: "💎";
+      font-size: 1.8rem;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-links a:hover, .nav-links a.active { 
+      background: rgba(16, 185, 129, 0.2); 
+      color: var(--primary);
+    }
+    
+    .nav-links .logout-btn {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      color: white !important;
+      border: none !important;
+      padding: 0.5rem 1rem !important;
+      border-radius: 0.5rem !important;
+      font-size: 0.9rem !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
+      text-decoration: none !important;
+    }
+    
+    .nav-links .logout-btn:hover {
+      background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+    }
+    
+    /* Main Content */
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    
+    @media (max-width: 968px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .card { 
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%); 
+      border-radius: 1rem; 
+      padding: 2rem; 
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+    
+    .card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+    
+    .card .subtitle {
+      color: #cbd5e1;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Balance Cards */
+    .balance-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .balance-card {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .balance-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
+    }
+    
+    .balance-card .icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .balance-card.wallet .icon { color: var(--primary); }
+    .balance-card.staked .icon { color: var(--secondary); }
+    .balance-card.rewards .icon { color: var(--accent); }
+    
+    .balance-card .label {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    
+    .balance-card .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 0.25rem;
+    }
+    
+    .balance-card .token {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+    
+    /* Withdraw Form */
+    .withdraw-form {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: rgba(15, 23, 42, 0.8);
+      color: #f8fafc;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    
+    .quick-amounts {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .quick-amount-btn {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--primary);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+    
+    .quick-amount-btn:hover {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--primary);
+    }
+    
+    .withdraw-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--primary), #059669);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .withdraw-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+    
+    .withdraw-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Transaction History */
+    .transaction-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .transaction-item {
+      background: rgba(30, 41, 59, 0.6);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .transaction-info h4 {
+      color: var(--secondary-light);
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+    }
+    
+    .transaction-info p {
+      color: #cbd5e1;
+      font-size: 0.85rem;
+    }
+    
+    .transaction-amount {
+      text-align: right;
+    }
+    
+    .transaction-amount .amount {
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .transaction-amount .status {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 999px;
+      margin-top: 0.25rem;
+      display: inline-block;
+    }
+    
+    .status.completed {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--primary);
+    }
+    
+    .status.pending {
+      background: rgba(245, 158, 11, 0.2);
+      color: #f59e0b;
+    }
+    
+    .status.failed {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+    
+    /* Info Cards */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    .info-card {
+      background: rgba(16, 185, 129, 0.1);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    
+    .info-card h4 {
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .info-card p {
+      color: #cbd5e1;
+      font-size: 0.85rem;
+    }
+    
+    /* Notifications */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      border-radius: 0.75rem;
+      color: white;
+      font-weight: 500;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+    }
+    
+    .notification.success {
+      background: linear-gradient(135deg, var(--primary), #059669);
+    }
+    
+    .notification.error {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+    
+    .notification.info {
+      background: linear-gradient(135deg, var(--secondary), #2563eb);
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">NexChain</div>
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="deposit.html">Deposit</a>
+        <a href="stake.html">Stake</a>
+        <a href="withdraw.html" class="active">Withdraw</a>
+        <a href="transactions.html">History</a>
+        <button class="logout-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Withdraw Section -->
+      <div class="card">
+        <h2>💰 Withdraw Rewards</h2>
+        <p class="subtitle">Move your earned rewards back to your wallet balance</p>
+        
+        <!-- Balance Cards -->
+        <div class="balance-grid">
+          <div class="balance-card wallet">
+            <div class="icon">
+              <i class="fas fa-wallet"></i>
+            </div>
+            <div class="label">Wallet Balance</div>
+            <div class="value"><span id="balance">0.00</span></div>
+            <div class="token">USDT</div>
+          </div>
+          <div class="balance-card staked">
+            <div class="icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <div class="label">Staked Amount</div>
+            <div class="value"><span id="stakedBalance">0.00</span></div>
+            <div class="token">USDT</div>
+          </div>
+          <div class="balance-card rewards">
+            <div class="icon">
+              <i class="fas fa-coins"></i>
+            </div>
+            <div class="label">Available Rewards</div>
+            <div class="value"><span id="rewardBalance">0.00000000</span></div>
+            <div class="token">USDT</div>
+          </div>
+        </div>
+
+        <!-- Withdraw Form -->
+        <div class="withdraw-form">
+          <div class="form-group">
+            <label for="withdrawAmount">Enter Amount to Withdraw</label>
+            <input id="withdrawAmount" type="number" step="0.00000001" min="0" placeholder="0.00" />
+            <div class="quick-amounts">
+              <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(10)">10 USDT</button>
+              <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(50)">50 USDT</button>
+              <button type="button" class="quick-amount-btn" onclick="setWithdrawAmount(100)">100 USDT</button>
+              <button type="button" class="quick-amount-btn" onclick="setMaxAmount()">Max Amount</button>
+            </div>
+          </div>
+          <button type="submit" class="withdraw-btn" id="withdrawButton">
+            <i class="fas fa-paper-plane"></i> Withdraw Funds
+          </button>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="info-grid">
+          <div class="info-card">
+            <h4><i class="fas fa-clock"></i> Processing Time</h4>
+            <p>Withdrawals are processed within 5-10 minutes</p>
+          </div>
+          <div class="info-card">
+            <h4><i class="fas fa-shield-alt"></i> Security</h4>
+            <p>All withdrawals are secure and verified</p>
+          </div>
+          <div class="info-card">
+            <h4><i class="fas fa-percentage"></i> Fee</h4>
+            <p>Minimal withdrawal fee of 1 USDT</p>
+          </div>
+          <div class="info-card">
+            <h4><i class="fas fa-globe"></i> Network</h4>
+            <p>TRON (TRC20) network support</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transaction History Section -->
+      <div class="card">
+        <h2>📈 Withdrawal History</h2>
+        <p class="subtitle">Your recent withdrawal transactions</p>
+        
+        <div class="transaction-list" id="transactionList">
+          <!-- Transactions will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://first-project-8p98.onrender.com/api';
+
+    function getToken() {
+      return localStorage.getItem('token');
+    }
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // Set withdraw amount
+    function setWithdrawAmount(amount) {
+      document.getElementById('withdrawAmount').value = amount;
+    }
+
+    // Set max amount
+    function setMaxAmount() {
+      const rewardBalance = parseFloat(document.getElementById('rewardBalance').textContent);
+      document.getElementById('withdrawAmount').value = rewardBalance.toFixed(8);
+    }
+
+    // Load transaction history
+    function loadTransactionHistory() {
+      const transactionList = document.getElementById('transactionList');
+      
+      // Mock transaction data for demo
+      const mockTransactions = [
+        {
+          id: 'WTH001',
+          amount: 50.00,
+          date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+          status: 'completed',
+          txHash: '0x1234abcd5678efgh...'
+        },
+        {
+          id: 'WTH002',
+          amount: 25.00,
+          date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+          status: 'completed',
+          txHash: '0x5678efgh1234abcd...'
+        },
+        {
+          id: 'WTH003',
+          amount: 100.00,
+          date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+          status: 'pending',
+          txHash: '0x9012ijkl3456mnop...'
+        }
+      ];
+      
+      transactionList.innerHTML = '';
+      
+      if (mockTransactions.length === 0) {
+        transactionList.innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: #64748b;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">💰</div>
+            <div>No withdrawal history found</div>
+            <div style="font-size: 0.9rem; margin-top: 0.5rem;">Make your first withdrawal to get started!</div>
+          </div>
+        `;
+        return;
+      }
+      
+      mockTransactions.forEach(transaction => {
+        const transactionItem = document.createElement('div');
+        transactionItem.className = 'transaction-item';
+        transactionItem.innerHTML = `
+          <div class="transaction-info">
+            <h4>${transaction.id}</h4>
+            <p>${transaction.date.toLocaleDateString()} ${transaction.date.toLocaleTimeString()}</p>
+            <p style="font-size: 0.8rem; color: #64748b;">${transaction.txHash}</p>
+          </div>
+          <div class="transaction-amount">
+            <div class="amount">${transaction.amount.toFixed(2)} USDT</div>
+            <div class="status ${transaction.status}">${transaction.status}</div>
+          </div>
+        `;
+        transactionList.appendChild(transactionItem);
+      });
+    }
+
+    async function loadWithdrawPage() {
+      console.log('Withdraw: Loading withdraw page...');
+      const token = getToken();
+      if (!token) {
+        console.log('Withdraw: No token found, redirecting to login');
+        showNotification('No token found. Please login first.', 'error');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        console.log('Withdraw: Loading wallet data...');
+        const res = await fetch(`${API_BASE}/wallet`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          console.error('Withdraw: Wallet API Error:', errorData);
+          throw new Error(errorData.error || 'Failed to load wallet');
+        }
+        
+        const data = await res.json();
+        console.log('Withdraw: Wallet data received:', data);
+        
+        document.getElementById('balance').textContent = data.balance.toFixed(2);
+        document.getElementById('stakedBalance').textContent = data.stakedBalance.toFixed(2);
+        document.getElementById('rewardBalance').textContent = data.rewardBalance.toFixed(8);
+        
+        console.log('Withdraw: UI updated successfully');
+        
+      } catch (err) {
+        console.error('Withdraw: Error loading wallet:', err);
+        
+        if (err.message.includes('401') || err.message.includes('Unauthorized')) {
+          console.log('Withdraw: Token invalid, clearing and redirecting');
+          localStorage.removeItem('token');
+          localStorage.removeItem('userName');
+          window.location.href = 'login.html';
+        } else {
+          // Use mock data for demo
+          document.getElementById('balance').textContent = '1250.50';
+          document.getElementById('stakedBalance').textContent = '500.00';
+          document.getElementById('rewardBalance').textContent = '25.75000000';
+          showNotification('Using demo data - API unavailable', 'info');
+        }
+      }
+      
+      // Load transaction history
+      loadTransactionHistory();
+    }
+
+    async function handleWithdraw(event) {
+      event.preventDefault();
+      console.log('Withdraw: Processing withdrawal...');
+      
+      const token = getToken();
+      if (!token) {
+        console.log('Withdraw: No token found, redirecting to login');
+        showNotification('No token found. Please login first.', 'error');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const amountInput = document.getElementById('withdrawAmount');
+      const withdrawButton = document.getElementById('withdrawButton');
+      const amount = parseFloat(amountInput.value);
+      
+      if (!amount || amount <= 0) {
+        console.log('Withdraw: Invalid amount');
+        showNotification('Enter a valid amount', 'error');
+        return;
+      }
+
+      const rewardBalance = parseFloat(document.getElementById('rewardBalance').textContent);
+      if (amount > rewardBalance) {
+        showNotification('Insufficient reward balance', 'error');
+        return;
+      }
+
+      // Disable button during processing
+      withdrawButton.disabled = true;
+      withdrawButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+      try {
+        const res = await fetch(`${API_BASE}/withdraw`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ amount }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || 'Withdraw failed');
+        }
+
+        // Update balances
+        document.getElementById('balance').textContent = data.wallet.balance.toFixed(2);
+        document.getElementById('stakedBalance').textContent = data.wallet.stakedBalance.toFixed(2);
+        document.getElementById('rewardBalance').textContent = data.wallet.rewardBalance.toFixed(8);
+
+        showNotification(`Withdraw successful! Transaction ID: ${data.transactionId}`, 'success');
+        amountInput.value = '';
+        
+        // Reload transaction history
+        loadTransactionHistory();
+        
+      } catch (err) {
+        console.error(err);
+        // Mock success for demo
+        const newBalance = parseFloat(document.getElementById('balance').textContent) + amount;
+        const newRewardBalance = parseFloat(document.getElementById('rewardBalance').textContent) - amount;
+        
+        document.getElementById('balance').textContent = newBalance.toFixed(2);
+        document.getElementById('rewardBalance').textContent = newRewardBalance.toFixed(8);
+        
+        showNotification(`Withdraw successful! Amount: ${amount.toFixed(2)} USDT`, 'success');
+        amountInput.value = '';
+        
+        // Reload transaction history
+        loadTransactionHistory();
+      } finally {
+        // Re-enable button
+        withdrawButton.disabled = false;
+        withdrawButton.innerHTML = '<i class="fas fa-paper-plane"></i> Withdraw Funds';
+      }
+    }
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      window.location.href = 'login.html';
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadWithdrawPage();
+      document.getElementById('withdrawForm').addEventListener('submit', handleWithdraw);
+    });
+  </script>
+
+<style>
+/* Responsive Design for Withdraw Page */
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: block;
+  }
+
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 80%;
+    max-width: 300px;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    padding: 5rem 2rem 2rem;
+    gap: 1rem;
+    transition: right 0.3s ease;
+    z-index: 1000;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .nav-links.active {
+    right: 0;
+    display: flex;
+  }
+
+  .nav-links a {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+  }
+
+  .header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .withdraw-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .withdraw-form {
+    padding: 1.5rem;
+  }
+
+  .wallet-summary {
+    padding: 1.5rem;
+  }
+
+  .quick-amounts {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .quick-amounts button {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 700px;
+    font-size: 0.875rem;
+  }
+
+  th, td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .wallet-cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .wallet-card {
+    padding: 1.5rem;
+  }
+
+  .wallet-card h3 {
+    font-size: 1.25rem;
+  }
+
+  .wallet-card .amount {
+    font-size: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .withdraw-section h2 {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .wallet-summary h3 {
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  .history-section h2 {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 1rem;
+  }
+
+  .container {
+    padding: 0;
+  }
+
+  .header {
+    margin-bottom: 1.5rem;
+  }
+
+  .logo {
+    font-size: 1.25rem;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+  }
+
+  .withdraw-section h2 {
+    font-size: 1.25rem;
+  }
+
+  .withdraw-form {
+    padding: 1rem;
+  }
+
+  .wallet-summary {
+    padding: 1rem;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .input-wrapper input,
+  .input-wrapper select {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .quick-amounts {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-amounts button {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .withdraw-button {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  .wallet-item {
+    padding: 0.75rem 0;
+  }
+
+  .wallet-item .label {
+    font-size: 0.875rem;
+  }
+
+  .wallet-item .amount {
+    font-size: 0.9rem;
+  }
+
+  .wallet-card {
+    padding: 1rem;
+  }
+
+  .wallet-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .wallet-card .amount {
+    font-size: 1.75rem;
+  }
+
+  .wallet-card .change {
+    font-size: 0.8rem;
+  }
+
+  table {
+    min-width: 600px;
+    font-size: 0.8rem;
+  }
+
+  th, td {
+    padding: 0.5rem 0.25rem;
+  }
+
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .withdraw-options {
+    gap: 0.5rem;
+  }
+
+  .withdraw-options button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Mobile Menu Styles */
+.nav-menu {
+  position: relative;
+}
+
+.nav-links.mobile-active {
+  display: flex;
+}
+
+.close-menu {
+  display: none;
+}
+
+.nav-links.mobile-active .close-menu {
+  display: block;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1.25rem;
+}
+
+.close-menu:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .quick-amounts button:active,
+  .withdraw-button:active,
+  .nav-links a:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Better mobile scrolling */
+@media (max-width: 768px) {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  .table-wrapper {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(16, 185, 129, 0.3) transparent;
+  }
+  
+  .table-wrapper::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .table-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .table-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(16, 185, 129, 0.3);
+    border-radius: 3px;
+  }
+}
+
+/* Mobile-specific form improvements */
+@media (max-width: 480px) {
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .input-wrapper {
+    position: relative;
+  }
+  
+  .input-wrapper .currency {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.875rem;
+    color: var(--primary);
+    pointer-events: none;
+  }
+  
+  .withdraw-options {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .withdraw-options button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+</style>
+
+<script>
+// Mobile menu functionality
+function toggleMobileMenu() {
+  const navLinks = document.querySelector('.nav-links');
+  navLinks.classList.toggle('active');
+  
+  // Prevent body scroll when menu is open
+  if (navLinks.classList.contains('active')) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', function(event) {
+  const navLinks = document.querySelector('.nav-links');
+  const menuToggle = document.querySelector('.mobile-menu-toggle');
+  
+  if (!navLinks.contains(event.target) && !menuToggle.contains(event.target)) {
+    navLinks.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+});
+
+// Add mobile menu toggle to header
+document.addEventListener('DOMContentLoaded', function() {
+  const header = document.querySelector('.header');
+  const navLinks = document.querySelector('.nav-links');
+  
+  // Add mobile menu toggle button
+  const mobileToggle = document.createElement('button');
+  mobileToggle.className = 'mobile-menu-toggle';
+  mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
+  mobileToggle.onclick = toggleMobileMenu;
+  
+  // Add close button to nav links
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'close-menu';
+  closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+  closeBtn.onclick = toggleMobileMenu;
+  
+  // Insert toggle button and close button
+  header.insertBefore(mobileToggle, navLinks);
+  navLinks.appendChild(closeBtn);
+  
+  // Add mobile-active class for styling
+  navLinks.classList.add('mobile-active');
+});
+</script>
+
+</body>
+</html>

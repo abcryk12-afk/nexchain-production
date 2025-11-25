@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NovaStake - Admin Setup</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    const API_BASE = 'https://first-project-8p98.onrender.com/api';
+
+    // Store admin accounts in localStorage for demo
+    let adminAccounts = JSON.parse(localStorage.getItem('adminAccounts')) || [];
+
+    // Initialize with default admin if no accounts exist
+    function initializeDefaultAdmin() {
+      if (adminAccounts.length === 0) {
+        adminAccounts = [
+          {
+            id: 1,
+            name: 'Super Admin',
+            email: 'admin@novastake.com',
+            password: 'Admin@123456',
+            role: 'super_admin',
+            created_at: new Date().toISOString(),
+            is_active: true
+          }
+        ];
+        localStorage.setItem('adminAccounts', JSON.stringify(adminAccounts));
+      }
+    }
+
+    // Create admin account
+    function createAdminAccount(event) {
+      event.preventDefault();
+      
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const role = document.getElementById('role').value;
+      
+      // Validation
+      if (!name || !email || !password || !confirmPassword) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+      }
+      
+      if (password !== confirmPassword) {
+        showNotification('Passwords do not match', 'error');
+        return;
+      }
+      
+      if (password.length < 8) {
+        showNotification('Password must be at least 8 characters', 'error');
+        return;
+      }
+      
+      // Check if email already exists
+      if (adminAccounts.find(admin => admin.email === email)) {
+        showNotification('Admin with this email already exists', 'error');
+        return;
+      }
+      
+      // Create new admin account
+      const newAdmin = {
+        id: Date.now(),
+        name: name,
+        email: email,
+        password: password, // In production, hash this password
+        role: role,
+        created_at: new Date().toISOString(),
+        is_active: true,
+        last_login: null
+      };
+      
+      adminAccounts.push(newAdmin);
+      localStorage.setItem('adminAccounts', JSON.stringify(adminAccounts));
+      
+      showNotification(`Admin account created successfully for ${email}`, 'success');
+      
+      // Reset form
+      document.getElementById('adminSetupForm').reset();
+      
+      // Update admin list
+      updateAdminList();
+    }
+
+    // Update admin list
+    function updateAdminList() {
+      const tbody = document.getElementById('adminListBody');
+      tbody.innerHTML = '';
+      
+      adminAccounts.forEach(admin => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${admin.id}</td>
+          <td>${admin.name}</td>
+          <td>${admin.email}</td>
+          <td>
+            <span class="badge badge-${getRoleBadgeColor(admin.role)}">
+              ${formatRole(admin.role)}
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-${admin.is_active ? 'success' : 'danger'}">
+              ${admin.is_active ? 'Active' : 'Inactive'}
+            </span>
+          </td>
+          <td>${new Date(admin.created_at).toLocaleDateString()}</td>
+          <td>${admin.last_login ? new Date(admin.last_login).toLocaleDateString() : 'Never'}</td>
+          <td>
+            <button class="btn btn-sm btn-primary" onclick="editAdmin(${admin.id})">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-warning" onclick="toggleAdminStatus(${admin.id})">
+              <i class="fas fa-${admin.is_active ? 'ban' : 'check'}"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteAdmin(${admin.id})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Get role badge color
+    function getRoleBadgeColor(role) {
+      const colors = {
+        'super_admin': 'danger',
+        'admin': 'primary',
+        'moderator': 'info',
+        'support': 'secondary'
+      };
+      return colors[role] || 'secondary';
+    }
+
+    // Format role for display
+    function formatRole(role) {
+      const formats = {
+        'super_admin': 'Super Admin',
+        'admin': 'Admin',
+        'moderator': 'Moderator',
+        'support': 'Support'
+      };
+      return formats[role] || role;
+    }
+
+    // Edit admin
+    function editAdmin(adminId) {
+      const admin = adminAccounts.find(a => a.id === adminId);
+      if (!admin) return;
+      
+      // Populate edit form
+      document.getElementById('editAdminId').value = admin.id;
+      document.getElementById('editName').value = admin.name;
+      document.getElementById('editEmail').value = admin.email;
+      document.getElementById('editRole').value = admin.role;
+      
+      // Show edit modal
+      document.getElementById('editAdminModal').style.display = 'block';
+    }
+
+    // Toggle admin status
+    function toggleAdminStatus(adminId) {
+      const admin = adminAccounts.find(a => a.id === adminId);
+      if (!admin) return;
+      
+      // Don't allow deactivating the last active admin
+      const activeAdmins = adminAccounts.filter(a => a.is_active);
+      if (activeAdmins.length === 1 && admin.is_active) {
+        showNotification('Cannot deactivate the last active admin', 'error');
+        return;
+      }
+      
+      admin.is_active = !admin.is_active;
+      localStorage.setItem('adminAccounts', JSON.stringify(adminAccounts));
+      
+      showNotification(`Admin ${admin.email} ${admin.is_active ? 'activated' : 'deactivated'}`, 'success');
+      updateAdminList();
+    }
+
+    // Delete admin
+    function deleteAdmin(adminId) {
+      const admin = adminAccounts.find(a => a.id === adminId);
+      if (!admin) return;
+      
+      // Don't allow deleting the last admin
+      if (adminAccounts.length === 1) {
+        showNotification('Cannot delete the last admin account', 'error');
+        return;
+      }
+      
+      if (confirm(`Are you sure you want to delete admin ${admin.email}?`)) {
+        adminAccounts = adminAccounts.filter(a => a.id !== adminId);
+        localStorage.setItem('adminAccounts', JSON.stringify(adminAccounts));
+        
+        showNotification(`Admin ${admin.email} deleted successfully`, 'success');
+        updateAdminList();
+      }
+    }
+
+    // Save admin edits
+    function saveAdminEdits() {
+      const adminId = parseInt(document.getElementById('editAdminId').value);
+      const admin = adminAccounts.find(a => a.id === adminId);
+      if (!admin) return;
+      
+      const newName = document.getElementById('editName').value.trim();
+      const newEmail = document.getElementById('editEmail').value.trim();
+      const newRole = document.getElementById('editRole').value;
+      
+      // Check if email already exists (excluding current admin)
+      if (adminAccounts.find(a => a.email === newEmail && a.id !== adminId)) {
+        showNotification('Admin with this email already exists', 'error');
+        return;
+      }
+      
+      // Update admin
+      admin.name = newName;
+      admin.email = newEmail;
+      admin.role = newRole;
+      
+      localStorage.setItem('adminAccounts', JSON.stringify(adminAccounts));
+      
+      showNotification(`Admin ${newEmail} updated successfully`, 'success');
+      closeEditModal();
+      updateAdminList();
+    }
+
+    // Close edit modal
+    function closeEditModal() {
+      document.getElementById('editAdminModal').style.display = 'none';
+    }
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `alert alert-${type} alert-dismissible fade show`;
+      notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      
+      const container = document.getElementById('notificationContainer');
+      container.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 5000);
+    }
+
+    // Go to admin login
+    function goToAdminLogin() {
+      window.location.href = 'admin-login.html';
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeDefaultAdmin();
+      updateAdminList();
+    });
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .setup-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .setup-header {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      text-align: center;
+    }
+
+    .setup-header h1 {
+      color: #1e3c72;
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .setup-header p {
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .setup-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    .section-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .section-card h2 {
+      color: #1e3c72;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #6366f1;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background: #6366f1;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #4f46e5;
+      transform: translateY(-2px);
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #059669;
+    }
+
+    .btn-warning {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #d97706;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-info {
+      background: #0ea5e9;
+      color: white;
+    }
+
+    .btn-info:hover {
+      background: #0284c7;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+
+    .admin-list {
+      margin-top: 30px;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #1e3c72;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    td {
+      color: #333;
+      font-size: 0.9rem;
+    }
+
+    tr:hover {
+      background: #f8fafc;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .badge-primary {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-warning {
+      background: #fed7aa;
+      color: #92400e;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-info {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-secondary {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h3 {
+      color: #1e3c72;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid transparent;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+
+    .alert-info {
+      background: #dbeafe;
+      color: #1e40af;
+      border-color: #bfdbfe;
+    }
+
+    .alert-warning {
+      background: #fed7aa;
+      color: #92400e;
+      border-color: #fdba74;
+    }
+
+    .alert-danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .alert-dismissible {
+      position: relative;
+    }
+
+    .btn-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .password-requirements {
+      background: #f8fafc;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .password-requirements h4 {
+      color: #1e3c72;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    .password-requirements ul {
+      margin-left: 20px;
+    }
+
+    .password-requirements li {
+      margin-bottom: 5px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .setup-container {
+        padding: 10px;
+      }
+
+      .setup-content {
+        grid-template-columns: 1fr;
+      }
+
+      .section-card {
+        padding: 20px;
+      }
+
+      .setup-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .table-responsive {
+        font-size: 0.8rem;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+
+      .modal-content {
+        margin: 10% auto;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="setup-container">
+    <!-- Setup Header -->
+    <div class="setup-header">
+      <h1><i class="fas fa-user-shield"></i> NovaStake Admin Setup</h1>
+      <p>Create and manage admin accounts for NovaStake platform</p>
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="goToAdminLogin()">
+          <i class="fas fa-sign-in-alt"></i> Go to Admin Login
+        </button>
+        <button class="btn btn-info" onclick="window.location.href='index.html'">
+          <i class="fas fa-home"></i> Back to Home
+        </button>
+      </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <!-- Setup Content -->
+    <div class="setup-content">
+      <!-- Create Admin Section -->
+      <div class="section-card">
+        <h2><i class="fas fa-user-plus"></i> Create Admin Account</h2>
+        <form id="adminSetupForm" onsubmit="createAdminAccount(event)">
+          <div class="form-group">
+            <label for="name">Admin Name</label>
+            <input type="text" id="name" placeholder="Enter admin name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Admin Email</label>
+            <input type="email" id="email" placeholder="admin@example.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password" required>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm password" required>
+          </div>
+
+          <div class="form-group">
+            <label for="role">Admin Role</label>
+            <select id="role" required>
+              <option value="">Select Role</option>
+              <option value="super_admin">Super Admin</option>
+              <option value="admin">Admin</option>
+              <option value="moderator">Moderator</option>
+              <option value="support">Support</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Create Admin Account
+          </button>
+        </form>
+
+        <div class="password-requirements">
+          <h4><i class="fas fa-info-circle"></i> Password Requirements:</h4>
+          <ul>
+            <li>Minimum 8 characters</li>
+            <li>Contains uppercase and lowercase letters</li>
+            <li>Contains at least one number</li>
+            <li>Contains special characters (recommended)</li>
+            <li>No email verification required</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Admin List Section -->
+      <div class="section-card">
+        <h2><i class="fas fa-users"></i> Existing Admin Accounts</h2>
+        <div class="admin-list">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Last Login</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminListBody">
+                <!-- Admin accounts will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Admin Modal -->
+  <div id="editAdminModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-user-edit"></i> Edit Admin Account</h3>
+        <button class="close-btn" onclick="closeEditModal()">&times;</button>
+      </div>
+      <form id="editAdminForm">
+        <input type="hidden" id="editAdminId">
+        <div class="form-group">
+          <label for="editName">Admin Name</label>
+          <input type="text" id="editName" required>
+        </div>
+        <div class="form-group">
+          <label for="editEmail">Admin Email</label>
+          <input type="email" id="editEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="editRole">Admin Role</label>
+          <select id="editRole" required>
+            <option value="super_admin">Super Admin</option>
+            <option value="admin">Admin</option>
+            <option value="moderator">Moderator</option>
+            <option value="support">Support</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveAdminEdits()">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

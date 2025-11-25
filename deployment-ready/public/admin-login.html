@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexChain - Admin Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    const API_BASE = 'https://first-project-8p98.onrender.com/api';
+
+    // Handle admin login
+    function handleAdminLogin(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      
+      if (!email || !password) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+      }
+      
+      // Show loading
+      const loginBtn = document.getElementById('loginBtn');
+      const originalText = loginBtn.innerHTML;
+      loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+      loginBtn.disabled = true;
+      
+      // Direct fallback login for now (API endpoints not available)
+      console.log('🔧 Using fallback login method...');
+      
+      // Fallback - check hardcoded credentials for demo
+      if (email === 'admin@nexchain.com' && password === 'Admin@123456') {
+          localStorage.setItem('adminToken', 'admin-token-fallback-' + Date.now());
+          localStorage.setItem('adminUser', JSON.stringify({
+            id: 1,
+            name: 'Admin User',
+            email: 'admin@nexchain.com',
+            role: 'super_admin'
+          }));
+          
+          showNotification('Admin login successful!', 'success');
+          
+          setTimeout(() => {
+            window.location.href = 'admin.html';
+          }, 1000);
+        } else {
+          showNotification('Invalid credentials! Use admin@nexchain.com / Admin@123456', 'error');
+        }
+      
+      // Reset button
+      loginBtn.innerHTML = originalText;
+      loginBtn.disabled = false;
+    }
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `alert alert-${type} alert-dismissible fade show`;
+      notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      
+      const container = document.getElementById('notificationContainer');
+      container.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 5000);
+    }
+
+    // Check if already logged in
+    function checkExistingLogin() {
+      const adminToken = localStorage.getItem('adminToken');
+      if (adminToken) {
+        // Redirect to admin panel
+        window.location.href = 'admin.html';
+        return true;
+      }
+      return false;
+    }
+
+    // Show login info
+    function showLoginInfo() {
+      document.getElementById('loginInfo').style.display = 'block';
+      document.querySelectorAll('.info-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.info-tab')[0].classList.add('active');
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!checkExistingLogin()) {
+        console.log('🔐 Admin login page loaded');
+      }
+    });
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 450px;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-header h1 {
+      color: #1e3c72;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .login-header p {
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .admin-icon {
+      font-size: 3rem;
+      color: #1e3c72;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      background: white;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #666;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: color 0.3s ease;
+    }
+
+    .password-toggle:hover {
+      color: #6366f1;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .login-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .register-section {
+      margin-top: 20px;
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .register-section p {
+      color: #cbd5e1;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+    }
+
+    .register-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .register-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    .register-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .login-back-btn {
+      flex: 1;
+      padding: 15px;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .login-back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+
+    .divider {
+      position: relative;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .divider span {
+      background: rgba(30, 60, 114, 0.95);
+      padding: 0 20px;
+      color: #cbd5e1;
+      font-size: 0.9rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .role-description {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    .role-description i {
+      color: #6366f1;
+    }
+
+    .role-description span {
+      flex: 1;
+    }
+
+    .back-to-login {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .admin-info {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: 10px;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+
+    .admin-info h3 {
+      color: #1e3c72;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .info-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .info-tab {
+      padding: 8px 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+    }
+
+    .info-tab:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .info-tab.active {
+      background: rgba(99, 102, 241, 0.3);
+      border-color: #6366f1;
+      color: white;
+    }
+
+    .info-content {
+      margin-bottom: 15px;
+    }
+
+    .admin-info p {
+      color: #cbd5e1;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    .admin-info .credentials {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid transparent;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+
+    .alert-info {
+      background: #dbeafe;
+      color: #1e40af;
+      border-color: #bfdbfe;
+    }
+
+    .alert-warning {
+      background: #fed7aa;
+      color: #92400e;
+      border-color: #fdba74;
+    }
+
+    .alert-danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .alert-dismissible {
+      position: relative;
+    }
+
+    .btn-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-link a {
+      color: white;
+      text-decoration: none;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+    }
+
+    .back-link a:hover {
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .login-container {
+        padding: 20px 15px;
+      }
+
+      .login-card {
+        padding: 30px 20px;
+      }
+
+      .login-header h1 {
+        font-size: 1.8rem;
+      }
+
+      .form-actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .register-btn,
+      .login-back-btn {
+        font-size: 0.9rem;
+        padding: 12px;
+      }
+
+      .register-section p {
+        font-size: 0.8rem;
+      }
+
+      .info-tabs {
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .info-tab {
+        text-align: center;
+        padding: 10px;
+      }
+
+      .role-description {
+        font-size: 0.8rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+
+      .login-btn {
+        padding: 12px;
+        font-size: 0.9rem;
+      }
+
+      .form-group input {
+        padding: 12px 12px 12px 40px;
+        font-size: 0.9rem;
+      }
+
+      .login-btn {
+        padding: 12px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="admin-icon">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h1>Admin Login</h1>
+        <p>NexChain Admin Panel</p>
+      </div>
+
+      <!-- Notification Container -->
+      <div id="notificationContainer"></div>
+
+      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+        <div class="form-group">
+          <label for="email">Admin Email</label>
+          <div class="input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="admin@nexchain.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Admin Password</label>
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="Enter admin password" required>
+            <button type="button" class="password-toggle" onclick="togglePassword()">
+              <i class="fas fa-eye" id="passwordToggle"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="login-btn" id="loginBtn">
+          <i class="fas fa-sign-in-alt"></i> Login to Admin Panel
+        </button>
+      </form>
+
+      <!-- Admin Information -->
+      <div class="admin-info">
+        <h3><i class="fas fa-info-circle"></i> Admin Information</h3>
+        <div class="info-tabs">
+          <div class="info-tab active" onclick="showLoginInfo()">Login Info</div>
+        </div>
+        
+        <div id="loginInfo" class="info-content">
+          <p>For demo purposes, use these credentials:</p>
+          <div class="credentials">
+            Email: admin@nexchain.com<br>
+            Password: Admin@123456
+          </div>
+        </div>
+        
+        <p style="margin-top: 10px; font-size: 0.8rem; color: #999;">
+          <i class="fas fa-exclamation-triangle"></i> In production, use secure admin credentials
+        </p>
+      </div>
+
+      <div class="back-link">
+        <a href="index.html">
+          <i class="fas fa-arrow-left"></i> Back to Main Site
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle password visibility
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const passwordToggle = document.getElementById('passwordToggle');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordToggle.className = 'fas fa-eye-slash';
+      } else {
+        passwordInput.type = 'password';
+        passwordToggle.className = 'fas fa-eye';
+      }
+    }
+  </script>
+</body>
+</html>

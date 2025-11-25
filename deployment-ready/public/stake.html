@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stake - NexChain</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-light: #34d399;
+      --secondary: #3b82f6;
+      --secondary-light: #60a5fa;
+      --accent: #8b5cf6;
+      --accent-light: #a78bfa;
+      --dark: #0f172a;
+      --light: #f8fafc;
+      --card-bg: #1e293b;
+      --border: rgba(16, 185, 129, 0.2);
+    }
+    
+    * { 
+      margin: 0; padding: 0; 
+      box-sizing: border-box; 
+      font-family: 'Poppins', sans-serif; 
+    }
+    
+    body { 
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); 
+      color: var(--light); 
+      min-height: 100vh;
+      padding: 20px; 
+    }
+    
+    .container { 
+      max-width: 1400px; 
+      margin: 0 auto; 
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .logo::before {
+      content: "💎";
+      font-size: 1.8rem;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-links a:hover, .nav-links a.active { 
+      background: rgba(16, 185, 129, 0.2); 
+      color: var(--primary);
+    }
+    
+    .nav-links .logout-btn {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      color: white !important;
+      border: none !important;
+      padding: 0.5rem 1rem !important;
+      border-radius: 0.5rem !important;
+      font-size: 0.9rem !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
+      text-decoration: none !important;
+    }
+    
+    .nav-links .logout-btn:hover {
+      background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+    }
+    
+    /* Main Content */
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    @media (max-width: 1200px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .card { 
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%); 
+      border-radius: 1rem; 
+      padding: 2rem; 
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+    
+    .card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+    
+    .card .subtitle {
+      color: #cbd5e1;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Balance Cards */
+    .balance-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .balance-card {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .balance-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
+    }
+    
+    .balance-card .icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .balance-card.available .icon { color: var(--primary); }
+    .balance-card.staked .icon { color: var(--secondary); }
+    .balance-card.rewards .icon { color: var(--accent); }
+    
+    .balance-card .label {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    
+    .balance-card .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 0.25rem;
+    }
+    
+    .balance-card .token {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+    
+    /* Staking Packages */
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .package-card {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .package-card.selected {
+      border-color: var(--primary);
+      background: rgba(16, 185, 129, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .package-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
+    }
+    
+    .package-card .period {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .package-card .apy {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    
+    .package-card .apy-label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 1rem;
+    }
+    
+    .package-card .features {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+    
+    /* Staking Form */
+    .staking-form {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: rgba(15, 23, 42, 0.8);
+      color: #f8fafc;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    
+    .quick-amounts {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .quick-amount-btn {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--primary);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+    
+    .quick-amount-btn:hover {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--primary);
+    }
+    
+    .stake-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--primary), #059669);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .stake-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+    
+    .stake-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Calculator */
+    .calculator {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    
+    .calculator h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+    
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .calc-item {
+      background: rgba(30, 41, 59, 0.6);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    
+    .calc-item .label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 0.25rem;
+    }
+    
+    .calc-item .value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--primary-light);
+    }
+    
+    /* Stakes Table */
+    .stakes-section {
+      grid-column: 1 / -1;
+    }
+    
+    .table-container {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--primary);
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+      color: #cbd5e1;
+    }
+    
+    tr:hover {
+      background: rgba(16, 185, 129, 0.05);
+    }
+    
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+    
+    .status-badge.active {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--primary);
+    }
+    
+    .status-badge.completed {
+      background: rgba(59, 130, 246, 0.2);
+      color: var(--secondary);
+    }
+    
+    .status-badge.pending {
+      background: rgba(245, 158, 11, 0.2);
+      color: #f59e0b;
+    }
+    
+    /* Notifications */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      border-radius: 0.75rem;
+      color: white;
+      font-weight: 500;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+    }
+    
+    .notification.success {
+      background: linear-gradient(135deg, var(--primary), #059669);
+    }
+    
+    .notification.error {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+    
+    .notification.info {
+      background: linear-gradient(135deg, var(--secondary), #2563eb);
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #64748b;
+    }
+    
+    .empty-state .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
+    .empty-state h3 {
+      margin-bottom: 0.5rem;
+      color: #9ca3af;
+    }
+    
+    .empty-state p {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">NexChain</div>
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="deposit.html">Deposit</a>
+        <a href="stake.html" class="active">Stake</a>
+        <a href="withdraw.html">Withdraw</a>
+        <a href="transactions.html">History</a>
+        <button class="logout-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Staking Section -->
+      <div class="card">
+        <h2>🔒 Stake USDT</h2>
+        <p class="subtitle">Earn rewards by staking your USDT</p>
+        
+        <!-- Balance Cards -->
+        <div class="balance-grid">
+          <div class="balance-card available">
+            <div class="icon">
+              <i class="fas fa-wallet"></i>
+            </div>
+            <div class="label">Available Balance</div>
+            <div class="value"><span id="availableBalance">0.00</span></div>
+            <div class="token">USDT</div>
+          </div>
+          <div class="balance-card staked">
+            <div class="icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <div class="label">Total Staked</div>
+            <div class="value"><span id="totalStaked">0.00</span></div>
+            <div class="token">USDT</div>
+          </div>
+          <div class="balance-card rewards">
+            <div class="icon">
+              <i class="fas fa-coins"></i>
+            </div>
+            <div class="label">Daily Rewards</div>
+            <div class="value"><span id="dailyRewards">0.000000</span></div>
+            <div class="token">USDT</div>
+          </div>
+        </div>
+
+        <!-- Staking Packages -->
+        <h3 style="color: var(--primary); margin-bottom: 1rem;">Choose Staking Package</h3>
+        <div class="packages-grid">
+          <div class="package-card" data-period="3" data-apy="5" onclick="selectPackage(this, 3, 5)">
+            <div class="period">3 Days</div>
+            <div class="apy">5%</div>
+            <div class="apy-label">Annual Percentage Yield</div>
+            <div class="features">
+              • Quick returns<br>
+              • Flexible staking<br>
+              • Low risk
+            </div>
+          </div>
+          <div class="package-card" data-period="30" data-apy="8" onclick="selectPackage(this, 30, 8)">
+            <div class="period">30 Days</div>
+            <div class="apy">8%</div>
+            <div class="apy-label">Annual Percentage Yield</div>
+            <div class="features">
+              • Monthly returns<br>
+              • Balanced risk<br>
+              • Popular choice
+            </div>
+          </div>
+          <div class="package-card selected" data-period="90" data-apy="10" onclick="selectPackage(this, 90, 10)">
+            <div class="period">90 Days</div>
+            <div class="apy">10%</div>
+            <div class="apy-label">Annual Percentage Yield</div>
+            <div class="features">
+              • High returns<br>
+              • Medium term<br>
+              • Best value
+            </div>
+          </div>
+          <div class="package-card" data-period="180" data-apy="11" onclick="selectPackage(this, 180, 11)">
+            <div class="period">180 Days</div>
+            <div class="apy">11%</div>
+            <div class="apy-label">Annual Percentage Yield</div>
+            <div class="features">
+              • Premium returns<br>
+              • Long term<br>
+              • Stable growth
+            </div>
+          </div>
+          <div class="package-card" data-period="365" data-apy="12" onclick="selectPackage(this, 365, 12)">
+            <div class="period">365 Days</div>
+            <div class="apy">12%</div>
+            <div class="apy-label">Annual Percentage Yield</div>
+            <div class="features">
+              • Maximum returns<br>
+              • Annual term<br>
+              • Best rewards
+            </div>
+          </div>
+        </div>
+
+        <!-- Staking Form -->
+        <div class="staking-form">
+          <form id="stakeForm">
+            <div class="form-group">
+              <label for="stakeAmount">Enter Amount to Stake</label>
+              <input id="stakeAmount" type="number" step="0.00000001" min="10" placeholder="Minimum 10 USDT" oninput="calculateRewards()" />
+              <div class="quick-amounts">
+                <button type="button" class="quick-amount-btn" onclick="setStakeAmount(50)">50 USDT</button>
+                <button type="button" class="quick-amount-btn" onclick="setStakeAmount(100)">100 USDT</button>
+                <button type="button" class="quick-amount-btn" onclick="setStakeAmount(500)">500 USDT</button>
+                <button type="button" class="quick-amount-btn" onclick="setStakeAmount(1000)">1000 USDT</button>
+                <button type="button" class="quick-amount-btn" onclick="setMaxAmount()">Max Amount</button>
+              </div>
+            </div>
+            <button type="submit" class="stake-btn" id="stakeButton">
+              <i class="fas fa-lock"></i> Stake Now
+            </button>
+          </form>
+        </div>
+
+        <!-- Calculator -->
+        <div class="calculator">
+          <h3>📊 Reward Calculator</h3>
+          <div class="calc-grid">
+            <div class="calc-item">
+              <div class="label">Daily Reward</div>
+              <div class="value" id="dailyRewardEstimate">0.000000 USDT</div>
+            </div>
+            <div class="calc-item">
+              <div class="label">Weekly Reward</div>
+              <div class="value" id="weeklyRewardEstimate">0.000000 USDT</div>
+            </div>
+            <div class="calc-item">
+              <div class="label">Monthly Reward</div>
+              <div class="value" id="monthlyRewardEstimate">0.000000 USDT</div>
+            </div>
+            <div class="calc-item">
+              <div class="label">Total Reward</div>
+              <div class="value" id="totalRewardEstimate">0.000000 USDT</div>
+            </div>
+            <div class="calc-item">
+              <div class="label">Final Amount</div>
+              <div class="value" id="finalAmountEstimate">0.00 USDT</div>
+            </div>
+            <div class="calc-item">
+              <div class="label">Selected Package</div>
+              <div class="value" id="selectedPackage">90 Days (10% APY)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Stakes Section -->
+      <div class="card">
+        <h2>📈 Active Stakes</h2>
+        <p class="subtitle">Your current staking positions</p>
+        
+        <div id="activeStakesList">
+          <!-- Active stakes will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Stakes History Section -->
+    <div class="card stakes-section">
+      <h2>📋 Staking History</h2>
+      <p class="subtitle">Complete record of all your staking transactions</p>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Amount</th>
+              <th>Package</th>
+              <th>APY</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Status</th>
+              <th>Rewards Earned</th>
+              <th>Daily Rewards</th>
+            </tr>
+          </thead>
+          <tbody id="stakesBody">
+            <!-- Stakes will be loaded here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://first-project-8p98.onrender.com/api';
+    
+    // Database state
+    let userData = {
+      availableBalance: 0,
+      totalStaked: 0,
+      dailyRewards: 0,
+      stakes: [],
+      transactions: []
+    };
+    
+    let selectedPackage = {
+      period: 90,
+      apy: 10
+    };
+
+    function getToken() {
+      return localStorage.getItem('token');
+    }
+
+    // Initialize user data from localStorage or API
+    async function initializeUserData() {
+      const token = getToken();
+      if (!token) {
+        showNotification('No token found. Please login first.', 'error');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        // Try to load from API first
+        const response = await fetch(`${API_BASE}/wallet`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          userData.availableBalance = data.balance || 0;
+          userData.totalStaked = data.stakedBalance || 0;
+          userData.dailyRewards = (userData.totalStaked * 0.10 / 365); // Default 10% APY
+        } else {
+          // Fallback to localStorage
+          loadUserDataFromStorage();
+        }
+      } catch (error) {
+        console.log('API unavailable, using localStorage data');
+        loadUserDataFromStorage();
+      }
+      
+      // Load stakes
+      await loadStakes();
+      updateUI();
+    }
+
+    // Load user data from localStorage
+    function loadUserDataFromStorage() {
+      const stored = localStorage.getItem('nexchain_user_data');
+      if (stored) {
+        userData = JSON.parse(stored);
+      } else {
+        // Initialize with demo data
+        userData = {
+          availableBalance: 1500.00,
+          totalStaked: 500.00,
+          dailyRewards: 0.1370, // 500 * 0.10 / 365
+          stakes: [
+            {
+              id: 1,
+              amount: 300,
+              period: 90,
+              apy: 10,
+              startDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'active',
+              rewardsEarned: 1.23,
+              dailyRewards: 0.0822
+            },
+            {
+              id: 2,
+              amount: 200,
+              period: 30,
+              apy: 8,
+              startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+              status: 'active',
+              rewardsEarned: 0.22,
+              dailyRewards: 0.0438
+            }
+          ],
+          transactions: []
+        };
+        saveUserDataToStorage();
+      }
+    }
+
+    // Save user data to localStorage
+    function saveUserDataToStorage() {
+      localStorage.setItem('nexchain_user_data', JSON.stringify(userData));
+    }
+
+    // Update UI with current data
+    function updateUI() {
+      document.getElementById('availableBalance').textContent = userData.availableBalance.toFixed(2);
+      document.getElementById('totalStaked').textContent = userData.totalStaked.toFixed(2);
+      document.getElementById('dailyRewards').textContent = userData.dailyRewards.toFixed(6);
+      
+      updateActiveStakes();
+      calculateRewards();
+    }
+
+    // Update active stakes display
+    function updateActiveStakes() {
+      const activeStakesList = document.getElementById('activeStakesList');
+      const activeStakes = userData.stakes.filter(stake => stake.status === 'active');
+      
+      if (activeStakes.length === 0) {
+        activeStakesList.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">🔒</div>
+            <h3>No Active Stakes</h3>
+            <p>Start staking to earn rewards!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      activeStakesList.innerHTML = activeStakes.map(stake => {
+        const startDate = new Date(stake.startDate);
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + stake.period);
+        const daysRemaining = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+        
+        return `
+          <div class="active-stake-card" style="background: rgba(15, 23, 42, 0.6); border-radius: 0.75rem; padding: 1.5rem; border: 1px solid rgba(16, 185, 129, 0.2); margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div>
+                <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary);">${stake.amount.toFixed(2)} USDT</div>
+                <div style="font-size: 0.9rem; color: #9ca3af;">${stake.period} Days at ${stake.apy}% APY</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 0.9rem; color: #9ca3af;">Daily Reward</div>
+                <div style="font-size: 1.1rem; font-weight: 600; color: var(--accent);">${stake.dailyRewards.toFixed(6)} USDT</div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-size: 0.85rem; color: #64748b;">
+                Started: ${startDate.toLocaleDateString()} | Ends: ${endDate.toLocaleDateString()}
+              </div>
+              <div style="font-size: 0.85rem; color: var(--primary);">
+                ${daysRemaining} days remaining
+              </div>
+            </div>
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(16, 185, 129, 0.2);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-size: 0.9rem; color: #9ca3af;">Total Rewards Earned</div>
+                <div style="font-size: 1.1rem; font-weight: 600; color: var(--primary);">${stake.rewardsEarned.toFixed(6)} USDT</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Select staking package
+    function selectPackage(element, period, apy) {
+      // Remove previous selection
+      document.querySelectorAll('.package-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Add selection to clicked package
+      element.classList.add('selected');
+      
+      // Update selected package
+      selectedPackage = { period, apy };
+      
+      // Update UI
+      document.getElementById('selectedPackage').textContent = `${period} Days (${apy}% APY)`;
+      calculateRewards();
+    }
+
+    // Calculate rewards
+    function calculateRewards() {
+      const amount = parseFloat(document.getElementById('stakeAmount').value) || 0;
+      const { period, apy } = selectedPackage;
+      
+      // Calculate rewards
+      const dailyRate = apy / 100 / 365;
+      const dailyReward = amount * dailyRate;
+      const weeklyReward = dailyReward * 7;
+      const monthlyReward = dailyReward * 30;
+      const totalReward = amount * (apy / 100);
+      const finalAmount = amount + totalReward;
+      
+      // Update UI
+      document.getElementById('dailyRewardEstimate').textContent = dailyReward.toFixed(6) + ' USDT';
+      document.getElementById('weeklyRewardEstimate').textContent = weeklyReward.toFixed(6) + ' USDT';
+      document.getElementById('monthlyRewardEstimate').textContent = monthlyReward.toFixed(6) + ' USDT';
+      document.getElementById('totalRewardEstimate').textContent = totalReward.toFixed(6) + ' USDT';
+      document.getElementById('finalAmountEstimate').textContent = finalAmount.toFixed(2) + ' USDT';
+    }
+
+    // Set stake amount
+    function setStakeAmount(amount) {
+      document.getElementById('stakeAmount').value = amount;
+      calculateRewards();
+    }
+
+    // Set maximum available amount
+    function setMaxAmount() {
+      document.getElementById('stakeAmount').value = userData.availableBalance.toFixed(2);
+      calculateRewards();
+    }
+
+    // Load stakes from database
+    async function loadStakes() {
+      const token = getToken();
+      const tbody = document.getElementById('stakesBody');
+      tbody.innerHTML = '';
+
+      try {
+        const response = await fetch(`${API_BASE}/stake`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+          const stakes = await response.json();
+          displayStakes(stakes);
+        } else {
+          // Use local data
+          displayStakes(userData.stakes);
+        }
+      } catch (error) {
+        console.log('Using local stake data');
+        displayStakes(userData.stakes);
+      }
+    }
+
+    // Display stakes in table
+    function displayStakes(stakes) {
+      const tbody = document.getElementById('stakesBody');
+      tbody.innerHTML = '';
+      
+      if (stakes.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9">
+              <div class="empty-state">
+                <div class="icon">🔒</div>
+                <h3>No Staking History</h3>
+                <p>Start staking to see your history here</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      stakes.forEach(stake => {
+        const startDate = new Date(stake.startDate);
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + stake.period);
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>#${stake.id}</td>
+          <td><strong>${stake.amount.toFixed(2)} USDT</strong></td>
+          <td>${stake.period} Days</td>
+          <td><span style="color: var(--accent); font-weight: 600;">${stake.apy}%</span></td>
+          <td>${startDate.toLocaleDateString()}</td>
+          <td>${endDate.toLocaleDateString()}</td>
+          <td>
+            <span class="status-badge ${stake.status.toLowerCase()}">
+              ${stake.status}
+            </span>
+          </td>
+          <td><strong style="color: var(--primary);">${(stake.rewardsEarned || 0).toFixed(6)} USDT</strong></td>
+          <td><strong style="color: var(--secondary-light);">${(stake.dailyRewards || 0).toFixed(6)} USDT</strong></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Handle staking
+    async function handleStake(event) {
+      event.preventDefault();
+      
+      const amount = parseFloat(document.getElementById('stakeAmount').value);
+      const { period, apy } = selectedPackage;
+      
+      // Validation
+      if (!amount || amount <= 0) {
+        showNotification('Please enter a valid amount to stake', 'error');
+        return;
+      }
+      
+      if (amount < 10) {
+        showNotification('Minimum staking amount is 10 USDT', 'error');
+        return;
+      }
+      
+      if (amount > userData.availableBalance) {
+        showNotification('Insufficient available balance', 'error');
+        return;
+      }
+
+      // Disable button during processing
+      const stakeButton = document.getElementById('stakeButton');
+      stakeButton.disabled = true;
+      stakeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+      try {
+        // Create new stake
+        const newStake = {
+          id: userData.stakes.length + 1,
+          amount: amount,
+          period: period,
+          apy: apy,
+          startDate: new Date().toISOString(),
+          status: 'active',
+          rewardsEarned: 0,
+          dailyRewards: amount * (apy / 100) / 365
+        };
+
+        // Update user data
+        userData.availableBalance -= amount;
+        userData.totalStaked += amount;
+        userData.dailyRewards = userData.stakes.reduce((total, stake) => 
+          total + (stake.dailyRewards || 0), 0) + newStake.dailyRewards;
+        userData.stakes.push(newStake);
+
+        // Save to localStorage
+        saveUserDataToStorage();
+
+        // Try to sync with API
+        const token = getToken();
+        try {
+          const response = await fetch(`${API_BASE}/stake`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              amount: amount,
+              period: period,
+              apy: apy
+            }),
+          });
+          
+          if (!response.ok) {
+            console.log('API sync failed, using local data');
+          }
+        } catch (error) {
+          console.log('API unavailable, using local data');
+        }
+
+        // Update UI
+        updateUI();
+        displayStakes(userData.stakes);
+        
+        // Clear form
+        document.getElementById('stakeAmount').value = '';
+        calculateRewards();
+        
+        showNotification(`Successfully staked ${amount.toFixed(2)} USDT for ${period} days at ${apy}% APY!`, 'success');
+        
+      } catch (err) {
+        console.error('Staking error:', err);
+        showNotification('Staking failed. Please try again.', 'error');
+      } finally {
+        // Re-enable button
+        stakeButton.disabled = false;
+        stakeButton.innerHTML = '<i class="fas fa-lock"></i> Stake Now';
+      }
+    }
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      window.location.href = 'login.html';
+    }
+
+    // Initialize page
+    window.addEventListener('DOMContentLoaded', async () => {
+      await initializeUserData();
+      document.getElementById('stakeForm').addEventListener('submit', handleStake);
+      
+      // Update daily rewards every minute
+      setInterval(() => {
+        userData.stakes.forEach(stake => {
+          if (stake.status === 'active') {
+            const daysElapsed = (Date.now() - new Date(stake.startDate).getTime()) / (1000 * 60 * 60 * 24);
+            stake.rewardsEarned = stake.dailyRewards * daysElapsed;
+          }
+        });
+        saveUserDataToStorage();
+        updateUI();
+        displayStakes(userData.stakes);
+      }, 60000); // Update every minute
+    });
+  </script>
+</body>
+    }
+    
+    h1 { 
+      font-size: 2.5rem; 
+      margin-bottom: 0.5rem; 
+      background: linear-gradient(135deg, #10b981, #3b82f6); 
+      background-clip: text;
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .subtitle { 
+      color: #cbd5e1; 
+      margin-bottom: 2rem; 
+      font-size: 1.1rem;
+    }
+    
+    /* Staking Info Section */
+    .staking-info {
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+      gap: 1.5rem; 
+      margin-bottom: 2rem;
+    }
+    
+    .info-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%); 
+      border-radius: 1rem; 
+      padding: 1.5rem; 
+      border: 1px solid rgba(16, 185, 129, 0.2); 
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
+    }
+    
+    .info-card:hover {
+      transform: translateY(-2px);
+    }
+    
+    .info-card .icon {
+      font-size: 2rem; 
+      margin-bottom: 1rem;
+    }
+    
+    .info-card h3 {
+      font-size: 1.25rem; 
+      margin-bottom: 0.5rem; 
+      color: #10b981;
+    }
+    
+    .info-card .value {
+      font-size: 1.5rem; 
+      font-weight: 700; 
+      color: #f8fafc;
+    }
+    
+    .info-card .description {
+      color: #cbd5e1; 
+      font-size: 0.9rem; 
+      margin-top: 0.5rem;
+    }
+    
+    /* Balance Cards */
+    .balance-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+      gap: 1.5rem; 
+      margin-bottom: 2rem; 
+    }
+    
+    .balance-card { 
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%); 
+      border-radius: 1rem; 
+      padding: 1.5rem; 
+      border: 1px solid rgba(16, 185, 129, 0.2); 
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .balance-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), transparent);
+      border-radius: 50%;
+      transform: translate(30px, -30px);
+    }
+    
+    .balance-card .label { 
+      font-size: 0.9rem; 
+      color: #cbd5e1; 
+      text-transform: uppercase; 
+      letter-spacing: 0.05em; 
+      margin-bottom: 0.5rem;
+    }
+    
+    .balance-card .value { 
+      font-size: 1.8rem; 
+      font-weight: 700; 
+      color: #10b981;
+    }
+    
+    .balance-card .value span { 
+      font-size: 1rem; 
+      font-weight: 500; 
+      color: #cbd5e1; 
+      margin-left: 0.5rem;
+    }
+    
+    /* Staking Calculator */
+    .calculator-section {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); 
+      border-radius: 1rem; 
+      padding: 2rem; 
+      border: 1px solid rgba(59, 130, 246, 0.2); 
+      margin-bottom: 2rem;
+    }
+    
+    .calculator-section h2 {
+      font-size: 1.5rem; 
+      margin-bottom: 1.5rem; 
+      color: #3b82f6;
+    }
+    
+    .calculator-grid {
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+      .calculator-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .stake-form {
+      background: rgba(30, 41, 59, 0.6); 
+      border-radius: 0.75rem; 
+      padding: 1.5rem; 
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block; 
+      margin-bottom: 0.5rem; 
+      color: #cbd5e1; 
+      font-size: 0.9rem; 
+      font-weight: 500;
+    }
+    
+    .input-wrapper {
+      position: relative;
+    }
+    
+    .input-wrapper input { 
+      width: 100%; 
+      padding: 1rem 3rem 1rem 1rem; 
+      border-radius: 0.75rem; 
+      border: 1px solid rgba(59, 130, 246, 0.3); 
+      background: rgba(15, 23, 42, 0.8); 
+      color: #f8fafc; 
+      font-size: 1rem; 
+      transition: all 0.3s ease;
+    }
+    
+    .input-wrapper input:focus { 
+      outline: none; 
+      border-color: #3b82f6; 
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+    
+    .input-wrapper .currency {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+    
+    .quick-amounts {
+      display: flex; 
+      gap: 0.5rem; 
+      margin-top: 0.5rem;
+    }
+    
+    .quick-amounts button {
+      padding: 0.5rem 1rem; 
+      border-radius: 0.5rem; 
+      border: 1px solid rgba(59, 130, 246, 0.3); 
+      background: rgba(59, 130, 246, 0.1); 
+      color: #3b82f6; 
+      font-size: 0.8rem; 
+      cursor: pointer; 
+      transition: all 0.3s ease;
+    }
+    
+    .quick-amounts button:hover {
+      background: rgba(59, 130, 246, 0.2);
+    }
+    
+    .stake-button { 
+      width: 100%; 
+      padding: 1rem 2rem; 
+      border-radius: 0.75rem; 
+      border: none; 
+      background: linear-gradient(135deg, #10b981, #059669); 
+      color: #ffffff; 
+      font-weight: 600; 
+      font-size: 1rem; 
+      cursor: pointer; 
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .stake-button:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+    }
+    
+    .stake-button:active { 
+      transform: translateY(0);
+    }
+    
+    .stake-button:disabled {
+      background: linear-gradient(135deg, #64748b, #475569);
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Rewards Calculator */
+    .rewards-preview {
+      background: rgba(30, 41, 59, 0.6); 
+      border-radius: 0.75rem; 
+      padding: 1.5rem; 
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    
+    .rewards-preview h3 {
+      color: #8b5cf6; 
+      margin-bottom: 1rem;
+    }
+    
+    .reward-item {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 0.75rem 0; 
+      border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+    }
+    
+    .reward-item:last-child {
+      border-bottom: none;
+    }
+    
+    .reward-item .label {
+      color: #cbd5e1; 
+      font-size: 0.9rem;
+    }
+    
+    .reward-item .value {
+      color: #8b5cf6; 
+      font-weight: 600;
+    }
+    
+    /* Staking Activity Table */
+    .activity-section {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); 
+      border-radius: 1rem; 
+      padding: 2rem; 
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+    
+    .activity-section h2 {
+      color: #8b5cf6; 
+      margin-bottom: 1.5rem;
+    }
+    
+    .table-wrapper {
+      overflow-x: auto;
+    }
+    
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      font-size: 0.9rem;
+    }
+    
+    th, td { 
+      padding: 1rem; 
+      border-bottom: 1px solid rgba(139, 92, 246, 0.2); 
+      text-align: left;
+    }
+    
+    th { 
+      font-size: 0.85rem; 
+      text-transform: uppercase; 
+      letter-spacing: 0.05em; 
+      color: #cbd5e1; 
+      font-weight: 600;
+    }
+    
+    td {
+      color: #f8fafc;
+    }
+    
+    .status-badge {
+      padding: 0.25rem 0.75rem; 
+      border-radius: 999px; 
+      font-size: 0.8rem; 
+      font-weight: 500;
+    }
+    
+    .status-badge.active {
+      background: rgba(16, 185, 129, 0.2); 
+      color: #10b981;
+    }
+    
+    .status-badge.pending {
+      background: rgba(245, 158, 11, 0.2); 
+      color: #f59e0b;
+    }
+    
+    .status-badge.completed {
+      background: rgba(59, 130, 246, 0.2); 
+      color: #3b82f6;
+    }
+    
+    /* Notifications */
+    .notification {
+      position: fixed; 
+      top: 20px; 
+      right: 20px; 
+      padding: 1rem 1.5rem; 
+      border-radius: 0.75rem; 
+      color: white; 
+      font-weight: 500; 
+      z-index: 1000; 
+      animation: slideIn 0.3s ease;
+    }
+    
+    .notification.success {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+    
+    .notification.error {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+    
+    .notification.info {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      main {
+        padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .staking-info,
+      .balance-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .nav-links {
+        flex-wrap: wrap;
+      }
+      
+      .nav-links a {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">NexChain</div>
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="stake.html" class="active">Stake</a>
+      <a href="withdraw.html">Withdraw</a>
+      <a href="transactions.html">History</a>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </header>
+  
+  <main>
+    <h1>Stake Your USDT</h1>
+    <div class="subtitle">Earn up to 12% APY by staking your USDT tokens with NexChain</div>
+
+    <!-- Staking Information Cards -->
+    <section class="staking-info">
+      <div class="info-card">
+        <div class="icon">📈</div>
+        <h3>Current APY</h3>
+        <div class="value">12%</div>
+        <div class="description">Annual percentage yield for all staking periods</div>
+      </div>
+      <div class="info-card">
+        <div class="icon">⏰</div>
+        <h3>Flexible Duration</h3>
+        <div class="value">30-365 Days</div>
+        <div class="description">Choose staking period that suits your needs</div>
+      </div>
+      <div class="info-card">
+        <div class="icon">🔒</div>
+        <h3>Secure Staking</h3>
+        <div class="value">100% Safe</div>
+        <div class="description">Your funds are protected with smart contracts</div>
+      </div>
+      <div class="info-card">
+        <div class="icon">💰</div>
+        <h3>Compound Rewards</h3>
+        <div class="value">Daily</div>
+        <div class="description">Rewards are compounded and distributed daily</div>
+      </div>
+    </section>
+
+    <!-- Balance Cards -->
+    <section class="balance-grid">
+      <div class="balance-card">
+        <div class="label">Available Balance</div>
+        <div class="value"><span id="walletBalance">0.00</span> <span>USDT</span></div>
+      </div>
+      <div class="balance-card">
+        <div class="label">Currently Staked</div>
+        <div class="value"><span id="stakedBalance">0.00</span> <span>USDT</span></div>
+      </div>
+      <div class="balance-card">
+        <div class="label">Total Rewards</div>
+        <div class="value"><span id="rewardBalance">0.00000000</span> <span>USDT</span></div>
+      </div>
+      <div class="balance-card">
+        <div class="label">Daily Earnings</div>
+        <div class="value"><span id="dailyRewards">0.00000000</span> <span>USDT</span></div>
+      </div>
+    </section>
+
+    <!-- Staking Calculator Section -->
+    <section class="calculator-section">
+      <h2>Staking Calculator</h2>
+      <div class="calculator-grid">
+        <!-- Staking Form -->
+        <div class="stake-form">
+          <div class="form-group">
+            <label for="stakeAmount">Amount to Stake</label>
+            <div class="input-wrapper">
+              <input id="stakeAmount" type="number" step="0.01" min="10" placeholder="Enter amount" oninput="calculateRewards()" />
+              <span class="currency">USDT</span>
+            </div>
+            <div class="quick-amounts">
+              <button type="button" onclick="setStakeAmount(100)">100 USDT</button>
+              <button type="button" onclick="setStakeAmount(500)">500 USDT</button>
+              <button type="button" onclick="setStakeAmount(1000)">1,000 USDT</button>
+              <button type="button" onclick="setMaxAmount()">Max</button>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="stakingPeriod">Staking Period</label>
+            <div class="input-wrapper">
+              <select id="stakingPeriod" onchange="calculateRewards()" style="width: 100%; padding: 1rem; border-radius: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.3); background: rgba(15, 23, 42, 0.8); color: #f8fafc; font-size: 1rem;">
+                <option value="30">30 Days - 8% APY</option>
+                <option value="90">90 Days - 10% APY</option>
+                <option value="180">180 Days - 11% APY</option>
+                <option value="365" selected>365 Days - 12% APY</option>
+              </select>
+            </div>
+          </div>
+          
+          <form id="stakeForm" onsubmit="handleStake(event)">
+            <button type="submit" class="stake-button" id="stakeButton">
+              <span>🔒 Stake Now</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Rewards Preview -->
+        <div class="rewards-preview">
+          <h3>📊 Estimated Rewards</h3>
+          <div class="reward-item">
+            <span class="label">Daily Rewards</span>
+            <span class="value" id="dailyRewardEstimate">0.00 USDT</span>
+          </div>
+          <div class="reward-item">
+            <span class="label">Weekly Rewards</span>
+            <span class="value" id="weeklyRewardEstimate">0.00 USDT</span>
+          </div>
+          <div class="reward-item">
+            <span class="label">Monthly Rewards</span>
+            <span class="value" id="monthlyRewardEstimate">0.00 USDT</span>
+          </div>
+          <div class="reward-item">
+            <span class="label">Total Rewards</span>
+            <span class="value" id="totalRewardEstimate">0.00 USDT</span>
+          </div>
+          <div class="reward-item" style="border-top: 2px solid rgba(139, 92, 246, 0.3); padding-top: 1rem; margin-top: 0.5rem;">
+            <span class="label" style="font-weight: 600;">Final Amount</span>
+            <span class="value" id="finalAmountEstimate" style="font-size: 1.2rem;">0.00 USDT</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Staking Activity Table -->
+    <section class="activity-section">
+      <h2>📋 Your Staking Activity</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Amount</th>
+              <th>APY</th>
+              <th>Period</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Status</th>
+              <th>Rewards Earned</th>
+            </tr>
+          </thead>
+          <tbody id="stakesBody">
+            <!-- Stakes will be loaded here -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

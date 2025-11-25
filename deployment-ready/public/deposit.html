@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit - NexChain</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-light: #34d399;
+            --secondary: #3b82f6;
+            --secondary-light: #60a5fa;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --card-bg: #1e293b;
+            --border: rgba(16, 185, 129, 0.2);
+        }
+        
+        * { 
+            margin: 0; padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Poppins', sans-serif; 
+        }
+        
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); 
+            color: var(--light); 
+            min-height: 100vh;
+            padding: 20px; 
+        }
+        
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logo::before {
+            content: "💎";
+            font-size: 1.8rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover, .nav-links a.active { 
+            background: rgba(16, 185, 129, 0.2); 
+            color: var(--primary);
+        }
+        
+        .nav-links .logout-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+            color: white !important;
+            border: none !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 0.5rem !important;
+            font-size: 0.9rem !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            text-decoration: none !important;
+        }
+        
+        .nav-links .logout-btn:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+        }
+        
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card { 
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%); 
+            border-radius: 1rem; 
+            padding: 2rem; 
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .card .subtitle {
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Address Section */
+        .address-section {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            margin-bottom: 1.5rem;
+        }
+        
+        .address-label {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .address-box { 
+            background: rgba(15, 23, 42, 0.8); 
+            padding: 1rem; 
+            border-radius: 0.5rem; 
+            margin: 1rem 0;
+            border: 1px dashed var(--primary);
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--primary-light);
+            position: relative;
+        }
+        
+        .address-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn { 
+            background: linear-gradient(135deg, var(--primary), #059669); 
+            color: white; 
+            border: none; 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 0.5rem; 
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn.secondary {
+            background: linear-gradient(135deg, var(--secondary), #2563eb);
+        }
+        
+        .btn.secondary:hover {
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* QR Code Section */
+        .qrcode-section {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .qrcode { 
+            width: 250px; 
+            height: 250px; 
+            background: rgba(15, 23, 42, 0.8); 
+            margin: 1rem auto; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 1rem;
+            border: 2px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .qrcode::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(16, 185, 129, 0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .qrcode-placeholder {
+            font-size: 3rem;
+            color: var(--primary);
+            opacity: 0.3;
+        }
+        
+        /* Info Cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .info-card {
+            background: rgba(16, 185, 129, 0.1);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .info-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .info-card p {
+            color: #cbd5e1;
+            font-size: 0.85rem;
+        }
+        
+        /* Recent Deposits */
+        .deposits-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .deposit-item {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .deposit-info h4 {
+            color: var(--secondary-light);
+            margin-bottom: 0.25rem;
+        }
+        
+        .deposit-info p {
+            color: #cbd5e1;
+            font-size: 0.85rem;
+        }
+        
+        .deposit-amount {
+            text-align: right;
+        }
+        
+        .deposit-amount .amount {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .deposit-amount .status {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 999px;
+            margin-top: 0.25rem;
+            display: inline-block;
+        }
+        
+        .status.completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--primary);
+        }
+        
+        .status.pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, var(--primary), #059669);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        
+        .modal-content h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .modal-content .qrcode-large {
+            width: 300px;
+            height: 300px;
+            margin: 1rem auto;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border);
+        }
+        
+        .modal-content .address-large {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            border: 1px solid var(--primary);
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            word-break: break-all;
+            color: var(--primary-light);
+        }
+        
+        .modal-close {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">NexChain</div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="deposit.html" class="active">Deposit</a>
+                <a href="stake.html">Stake</a>
+                <a href="withdraw.html">Withdraw</a>
+                <a href="transactions.html">History</a>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Deposit Section -->
+            <div class="card">
+                <h2>💰 Deposit USDT</h2>
+                <p class="subtitle">Send USDT to your unique deposit address</p>
+                
+                <!-- Address Section -->
+                <div class="address-section">
+                    <div class="address-label">Your USDT Deposit Address</div>
+                    <div class="address-box" id="walletAddress">
+                        Loading address...
+                    </div>
+                    <div class="address-actions">
+                        <button class="btn" onclick="copyAddress()">
+                            <i class="far fa-copy"></i> Copy Address
+                        </button>
+                        <button class="btn secondary" onclick="showQRModal()">
+                            <i class="fas fa-qrcode"></i> Show QR Code
+                        </button>
+                    </div>
+                </div>
+
+                <!-- QR Code Section -->
+                <div class="qrcode-section">
+                    <h3>Scan QR Code</h3>
+                    <div class="qrcode">
+                        <div class="qrcode-placeholder">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                    </div>
+                    <p style="color: #cbd5e1; font-size: 0.9rem;">Click "Show QR Code" for larger view</p>
+                </div>
+
+                <!-- Info Cards -->
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4><i class="fas fa-network-wired"></i> Network</h4>
+                        <p>TRON (TRC20)</p>
+                    </div>
+                    <div class="info-card">
+                        <h4><i class="fas fa-coins"></i> Minimum</h4>
+                        <p>10 USDT</p>
+                    </div>
+                    <div class="info-card">
+                        <h4><i class="fas fa-clock"></i> Confirmations</h4>
+                        <p>12 Required</p>
+                    </div>
+                    <div class="info-card">
+                        <h4><i class="fas fa-shield-alt"></i> Security</h4>
+                        <p>100% Secure</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Deposits Section -->
+            <div class="card">
+                <h2>📈 Recent Deposits</h2>
+                <p class="subtitle">Your latest deposit transactions</p>
+                
+                <div class="deposits-list" id="depositsList">
+                    <!-- Deposits will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="modal" id="qrModal">
+        <div class="modal-content">
+            <h3>📱 Scan QR Code</h3>
+            <div class="qrcode-large">
+                <div class="qrcode-placeholder">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+            </div>
+            <div class="address-large" id="modalAddress">
+                Loading address...
+            </div>
+            <button class="modal-close" onclick="closeQRModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Get user's wallet address from localStorage
+        function getUserWalletAddress() {
+            const userWallet = JSON.parse(localStorage.getItem('userWallet') || '{}');
+            if (userWallet.address) {
+                return userWallet.address;
+            }
+            
+            // Fallback to userDepositAddress
+            const depositAddress = localStorage.getItem('userDepositAddress');
+            if (depositAddress) {
+                return depositAddress;
+            }
+            
+            // Generate mock address if none exists
+            const mockAddress = '0x' + Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+            localStorage.setItem('userDepositAddress', mockAddress);
+            return mockAddress;
+        }
+
+        // Load user address
+        function loadUserAddress() {
+            const address = getUserWalletAddress();
+            document.getElementById('walletAddress').textContent = address;
+            document.getElementById('modalAddress').textContent = address;
+        }
+
+        // Copy address function
+        function copyAddress() {
+            const address = document.getElementById('walletAddress').textContent;
+            navigator.clipboard.writeText(address).then(() => {
+                showNotification('Address copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy address', 'error');
+            });
+        }
+
+        // Show QR modal
+        function showQRModal() {
+            document.getElementById('qrModal').classList.add('active');
+        }
+
+        // Close QR modal
+        function closeQRModal() {
+            document.getElementById('qrModal').classList.remove('active');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Load recent deposits
+        function loadRecentDeposits() {
+            const depositsList = document.getElementById('depositsList');
+            
+            // Mock deposit data for demo
+            const mockDeposits = [
+                {
+                    id: 'DEP001',
+                    amount: 500.00,
+                    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+                    status: 'completed',
+                    txHash: '0x1234abcd5678efgh...'
+                },
+                {
+                    id: 'DEP002',
+                    amount: 1000.00,
+                    date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+                    status: 'completed',
+                    txHash: '0x5678efgh1234abcd...'
+                },
+                {
+                    id: 'DEP003',
+                    amount: 250.00,
+                    date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+                    status: 'pending',
+                    txHash: '0x9012ijkl3456mnop...'
+                }
+            ];
+            
+            depositsList.innerHTML = '';
+            
+            if (mockDeposits.length === 0) {
+                depositsList.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #64748b;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">💰</div>
+                        <div>No deposits found</div>
+                        <div style="font-size: 0.9rem; margin-top: 0.5rem;">Make your first deposit to get started!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            mockDeposits.forEach(deposit => {
+                const depositItem = document.createElement('div');
+                depositItem.className = 'deposit-item';
+                depositItem.innerHTML = `
+                    <div class="deposit-info">
+                        <h4>${deposit.id}</h4>
+                        <p>${deposit.date.toLocaleDateString()} ${deposit.date.toLocaleTimeString()}</p>
+                        <p style="font-size: 0.8rem; color: #64748b;">${deposit.txHash}</p>
+                    </div>
+                    <div class="deposit-amount">
+                        <div class="amount">${deposit.amount.toFixed(2)} USDT</div>
+                        <div class="status ${deposit.status}">${deposit.status}</div>
+                    </div>
+                `;
+                depositsList.appendChild(depositItem);
+            });
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userName');
+            window.location.href = 'login.html';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserAddress();
+            loadRecentDeposits();
+            
+            // Close modal on outside click
+            document.getElementById('qrModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeQRModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
